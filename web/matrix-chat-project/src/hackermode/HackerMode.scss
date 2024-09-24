@@ -1,0 +1,13 @@
+@use '../everything' as *;
+
+@include react-md-utils;
+
+#textarea {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0.5em;
+  font-family: 'Roboto Mono', 'Courier New', Courier, monospace;
+  color: $rmd-green-a-400;
+  background-color: $rmd-black-base;
+}

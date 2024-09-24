@@ -1,0 +1,7 @@
+@use '../../everything' as *;
+
+@include react-md-utils;
+
+#serverlist {
+  background-color: $rmd-theme-primary;
+}

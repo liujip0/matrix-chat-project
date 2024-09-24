@@ -1,8 +1,9 @@
 import { Avatar, List, ListItem } from 'react-md';
+import './ServerList.scss';
 
 export default function ServerList() {
   return (
-    <List>
+    <List id="serverlist">
       <ListItem>
         <Avatar color="red">a</Avatar>
       </ListItem>

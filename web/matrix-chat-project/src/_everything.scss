@@ -3,6 +3,17 @@
 @forward 'react-md';
 
 @font-face {
+  font-family: 'Roboto';
+  src: url('/fonts/Roboto/Roboto-Black.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 900;
+}
+@font-face {
+  font-family: 'Roboto';
+  src: url('/font/Roboto/Roboto-BlackItalic.ttf');
+}
+
+@font-face {
   font-family: 'Roboto Mono';
   src: url('/fonts/Roboto Mono/RobotoMono-VariableFont_wght.ttf')
     format('truetype-variations');

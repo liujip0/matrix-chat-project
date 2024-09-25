@@ -2,12 +2,14 @@ import { Fragment, useRef, useState } from 'react';
 import './HackerMode.scss';
 
 export default function HackerMode() {
+  const [forceRerender, setForceRerender] = useState(0);
   const textareaRef = useRef<HTMLDivElement>(null);
-  const [textareaContents, setTextareaContents] = useState([
+  const [textareaContents, setTextareaContents] = useState<string[]>([
     'abcde',
     'fghijkl'
   ]);
   const [cursorPos, setCursorPos] = useState<number | null>(0);
+  console.log(textareaContents);
   return (
     <div
       id="textarea"
@@ -19,10 +21,8 @@ export default function HackerMode() {
       ref={textareaRef}
       tabIndex={0}
       onKeyDown={(event) => {
-        console.log('keydown');
         switch (event.key) {
           case 'ArrowLeft': {
-            console.log('left');
             if (cursorPos !== null) {
               setCursorPos(
                 Math.max(
@@ -41,27 +41,37 @@ export default function HackerMode() {
           }
           case 'Backspace': {
             if (cursorPos !== null) {
-              setTextareaContents([
-                ...textareaContents.slice(0, textareaContents.length - 2),
-                textareaContents[textareaContents.length - 1].slice(
-                  0,
-                  textareaContents[textareaContents.length - 1].length +
-                    cursorPos -
-                    1
-                ) +
-                  textareaContents[textareaContents.length - 1].slice(
-                    textareaContents[textareaContents.length - 1].length +
-                      cursorPos,
-                    textareaContents[textareaContents.length - 1].length - 1
-                  )
-              ]);
+              const newTextareaContents = textareaContents;
+              const lastItem = textareaContents.pop()!;
+              const newLastItem =
+                lastItem.slice(0, lastItem.length + cursorPos - 1) +
+                lastItem.slice(lastItem.length + cursorPos);
+              newTextareaContents.push(newLastItem);
+              setTextareaContents(newTextareaContents);
+              setForceRerender(forceRerender + 1);
             }
+            console.log(textareaContents);
+            break;
           }
           default: {
+            if (event.key.replace(/[\u0300-\u036f]/g, '').length === 1) {
+              if (cursorPos !== null) {
+                const newTextareaContents = textareaContents;
+                const lastItem = textareaContents.pop()!;
+                const newLastItem =
+                  lastItem.slice(0, lastItem.length + cursorPos) +
+                  event.key +
+                  lastItem.slice(lastItem.length + cursorPos);
+                newTextareaContents.push(newLastItem);
+                setTextareaContents(newTextareaContents);
+                setForceRerender(forceRerender + 1);
+              }
+            }
             break;
           }
         }
       }}>
+      <div style={{ display: 'none' }}>{forceRerender}</div>
       {textareaContents.map((line, lineIndex) => (
         <Fragment key={lineIndex}>
           {'> ' +

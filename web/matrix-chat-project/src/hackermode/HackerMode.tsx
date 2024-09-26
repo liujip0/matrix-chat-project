@@ -1,12 +1,14 @@
-import { Fragment, useRef, useState } from 'react';
+import { Fragment, useState } from 'react';
 import './HackerMode.scss';
 
-export default function HackerMode() {
+type HackerModeProps = {
+  setHackerMode: (value: boolean) => void;
+};
+export default function HackerMode({ setHackerMode }: HackerModeProps) {
   const [forceRerender, setForceRerender] = useState(0);
-  const textareaRef = useRef<HTMLDivElement>(null);
   const [textareaContents, setTextareaContents] = useState<string[]>([
-    'abcde',
-    'fghijkl'
+    'Welcome to Hacker Mode!\nq to escape, h for help',
+    ''
   ]);
   const [cursorPos, setCursorPos] = useState<number | null>(0);
   console.log(textareaContents);
@@ -14,11 +16,8 @@ export default function HackerMode() {
     <div
       id="textarea"
       onLoad={() => {
-        if (textareaRef.current) {
-          textareaRef.current.focus();
-        }
+        document.getElementById('textarea')?.focus();
       }}
-      ref={textareaRef}
       tabIndex={0}
       onKeyDown={(event) => {
         switch (event.key) {
@@ -42,15 +41,42 @@ export default function HackerMode() {
           case 'Backspace': {
             if (cursorPos !== null) {
               const newTextareaContents = textareaContents;
-              const lastItem = textareaContents.pop()!;
-              const newLastItem =
+              let lastItem = textareaContents.pop()!;
+              lastItem =
                 lastItem.slice(0, lastItem.length + cursorPos - 1) +
                 lastItem.slice(lastItem.length + cursorPos);
-              newTextareaContents.push(newLastItem);
+              newTextareaContents.push(lastItem);
               setTextareaContents(newTextareaContents);
               setForceRerender(forceRerender + 1);
             }
             console.log(textareaContents);
+            break;
+          }
+          case 'Enter': {
+            const newTextareaContents = textareaContents;
+            let lastItem = newTextareaContents.pop()!;
+            switch (lastItem) {
+              case 'h':
+              case 'help': {
+                lastItem +=
+                  "\nNot implemented yet, you'll just have to memorize the commands.\nGood luck!";
+                newTextareaContents.push(lastItem);
+                newTextareaContents.push('');
+                break;
+              }
+              case 'q':
+              case 'quit': {
+                setHackerMode(false);
+                break;
+              }
+              default: {
+                lastItem += '\nInvalid command.';
+                newTextareaContents.push(lastItem);
+                newTextareaContents.push('');
+              }
+            }
+            setTextareaContents(newTextareaContents);
+            setForceRerender(forceRerender + 1);
             break;
           }
           default: {
@@ -74,13 +100,19 @@ export default function HackerMode() {
       <div style={{ display: 'none' }}>{forceRerender}</div>
       {textareaContents.map((line, lineIndex) => (
         <Fragment key={lineIndex}>
-          {'> ' +
-            (cursorPos !== null && lineIndex === textareaContents.length - 1
-              ? line.slice(0, line.length + cursorPos) +
-                '\u2588' +
-                line.slice(line.length + cursorPos + 1)
-              : line)}
-          <br />
+          {(cursorPos !== null && lineIndex === textareaContents.length - 1
+            ? line.slice(0, line.length + cursorPos) +
+              '\u2588' +
+              line.slice(line.length + cursorPos + 1)
+            : line
+          )
+            .split('\n')
+            .map((subline, sublineIndex) => (
+              <Fragment key={sublineIndex}>
+                {(sublineIndex === 0 ? '>\u00a0' : '\u00a0\u00a0') + subline}
+                <br />
+              </Fragment>
+            ))}
         </Fragment>
       ))}
     </div>

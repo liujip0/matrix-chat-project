@@ -9,7 +9,7 @@ export default function App() {
   const [hackerMode, setHackerMode] = useState(true);
   return (
     <Configuration {...overrides}>
-      {hackerMode ? <HackerMode /> : <Gui />}
+      {hackerMode ? <HackerMode setHackerMode={setHackerMode} /> : <Gui />}
     </Configuration>
   );
 }

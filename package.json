@@ -1,0 +1,14 @@
+{
+  "name": "matrix-chat-project",
+  "version": "0.0.0",
+  "author": {
+    "name": "Jiping Liu",
+    "url": "https://github.com/liujip0"
+  },
+  "contributors": [
+    {
+      "name": "Liam Brown"
+    }
+  ],
+  "repository": "github:liujip0/matrix-chat-project"
+}

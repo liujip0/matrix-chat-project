@@ -3,12 +3,14 @@ import { Configuration } from 'react-md';
 import Gui from './guimode/Gui.tsx';
 import HackerMode from './hackermode/HackerMode.tsx';
 
-const overrides = {};
+const mdOverrides = {};
+
+const client = sdk.
 
 export default function App() {
   const [hackerMode, setHackerMode] = useState(true);
   return (
-    <Configuration {...overrides}>
+    <Configuration {...mdOverrides}>
       {hackerMode ? <HackerMode setHackerMode={setHackerMode} /> : <Gui />}
     </Configuration>
   );

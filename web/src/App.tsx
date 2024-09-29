@@ -5,8 +5,6 @@ import HackerMode from './hackermode/HackerMode.tsx';
 
 const mdOverrides = {};
 
-const client = sdk.
-
 export default function App() {
   const [hackerMode, setHackerMode] = useState(true);
   return (

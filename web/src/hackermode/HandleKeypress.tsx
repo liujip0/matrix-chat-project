@@ -1,4 +1,4 @@
-import { handleCommand } from './HandleCommand.tsx';
+import { handleEnter } from './HandleEnter.tsx';
 
 export async function handleKeyPress(
   event: React.KeyboardEvent<HTMLDivElement>,
@@ -18,8 +18,6 @@ export async function handleKeyPress(
   setDeviceId: (value: string) => void,
   accessToken: string,
   setAccessToken: (value: string) => void,
-  forceRerender: number,
-  setForceRerender: (value: number) => void,
   setHackerMode: (value: boolean) => void
 ) {
   if (event.ctrlKey && event.key === 'c') {
@@ -29,8 +27,7 @@ export async function handleKeyPress(
     newTextareaContents.push(lastItem);
     newTextareaContents.push('');
     setTextareaContents(newTextareaContents);
-    setForceRerender(forceRerender + 1);
-  } else if (!commandRunning) {
+  } else {
     switch (event.key) {
       case 'ArrowLeft': {
         if (
@@ -65,13 +62,12 @@ export async function handleKeyPress(
           }
           newTextareaContents.push(lastItem);
           setTextareaContents(newTextareaContents);
-          setForceRerender(forceRerender + 1);
         }
         break;
       }
       case 'Enter': {
         setCommandRunning(true);
-        handleCommand(
+        handleEnter(
           textareaContents,
           setTextareaContents,
           mode,
@@ -84,10 +80,11 @@ export async function handleKeyPress(
           setDeviceId,
           accessToken,
           setAccessToken,
-          setHackerMode
+          setHackerMode,
+          commandRunning,
+          setCommandRunning
         );
         setCursorPos(0);
-        setForceRerender(forceRerender + 1);
         break;
       }
       default: {
@@ -101,7 +98,6 @@ export async function handleKeyPress(
               lastItem.slice(lastItem.length + cursorPos);
             newTextareaContents.push(newLastItem);
             setTextareaContents(newTextareaContents);
-            setForceRerender(forceRerender + 1);
           }
         }
         break;

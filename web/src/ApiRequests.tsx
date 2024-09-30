@@ -20,6 +20,7 @@ export async function matrixLogin(
       success: true;
       deviceId: string;
       accessToken: string;
+      homeserver: string;
     }
   | {
       success: false;
@@ -49,7 +50,8 @@ export async function matrixLogin(
     return {
       success: true,
       deviceId: responseJson.device_id,
-      accessToken: responseJson.access_token
+      accessToken: responseJson.access_token,
+      homeserver: responseJson.well_known.base_url
     };
   } else {
     const responseJson: matrixLogin429 = await response.json();

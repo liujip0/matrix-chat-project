@@ -55,10 +55,9 @@ export default function HackerMode({
           setDeviceId,
           accessToken,
           setAccessToken,
-          forceRerender,
-          setForceRerender,
           setHackerMode
         );
+        setForceRerender(forceRerender + 1);
       }}>
       <div style={{ display: 'none' }}>{forceRerender}</div>
       {textareaContents.map((line, lineIndex) => (

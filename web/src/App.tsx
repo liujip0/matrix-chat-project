@@ -7,9 +7,24 @@ const mdOverrides = {};
 
 export default function App() {
   const [hackerMode, setHackerMode] = useState(true);
+  const [homeserver, setHomeserver] = useState('');
+  const [deviceId, setDeviceId] = useState('');
+  const [accessToken, setAccessToken] = useState('');
   return (
     <Configuration {...mdOverrides}>
-      {hackerMode ? <HackerMode setHackerMode={setHackerMode} /> : <Gui />}
+      {hackerMode ? (
+        <HackerMode
+          setHackerMode={setHackerMode}
+          homeserver={homeserver}
+          setHomeserver={setHomeserver}
+          deviceId={deviceId}
+          setDeviceId={setDeviceId}
+          accessToken={accessToken}
+          setAccessToken={setAccessToken}
+        />
+      ) : (
+        <Gui />
+      )}
     </Configuration>
   );
 }

@@ -1,4 +1,8 @@
-import { matrixLogin } from '../ApiRequests.tsx';
+import {
+  matrixListJoinedRooms,
+  matrixListPublicRooms,
+  matrixLogin
+} from '../ApiRequests.tsx';
 
 export async function handleEnter(
   textareaContents: string[],
@@ -15,7 +19,8 @@ export async function handleEnter(
   setAccessToken: (value: string) => void,
   setHackerMode: (value: boolean) => void,
   commandRunning: boolean,
-  setCommandRunning: (value: boolean) => void
+  setCommandRunning: (value: boolean) => void,
+  setCursorPos: (value: number | null) => void
 ) {
   const newTextareaContents = textareaContents;
   let lastItem = newTextareaContents.pop()!;
@@ -30,28 +35,61 @@ export async function handleEnter(
           lastItem +=
             "\nNot implemented yet, you'll just have to memorize the commands.\nGood luck!";
           newCommand = true;
+          setCommandRunning(false);
           break;
         }
         case 'q':
         case 'quit': {
           if (lastItemArr.length === 1) {
             setHackerMode(false);
+            setCommandRunning(false);
           }
           break;
         }
         case 'l':
         case 'login': {
-          setMode('loginhomeserver');
-          lastItem += '\nHomeserver: \u200b';
+          setMode('loginuserid');
+          lastItem += '\nUser ID: \u200b';
           break;
         }
         case 'ls':
         case 'list': {
+          setCursorPos(null);
+          if (lastItemArr.length === 1) {
+            const response = await matrixListJoinedRooms(
+              homeserver,
+              accessToken
+            );
+            if (response.success) {
+              lastItem += '\n' + response.rooms.join('\n');
+            } else {
+              lastItem += '\nAPI request failed\n' + response.error;
+            }
+          } else if (lastItemArr[1] === 'p' || lastItemArr[1] === 'public') {
+            const response = await matrixListPublicRooms(
+              homeserver,
+              accessToken,
+              lastItemArr[2] ? lastItemArr[2] : undefined
+            );
+            if (response.success) {
+              lastItem +=
+                '\n' +
+                response.rooms
+                  .map((room) => `${room.name}     ${room.id}`)
+                  .join('\n');
+            } else {
+              lastItem += '\nAPI request failed\n' + response.error;
+            }
+          }
+          setCursorPos(0);
+          newCommand = true;
+          setCommandRunning(false);
           break;
         }
         default: {
           lastItem += '\nInvalid command.';
           newCommand = true;
+          setCommandRunning(false);
         }
       }
     } else {
@@ -60,31 +98,17 @@ export async function handleEnter(
     }
   } else {
     switch (mode) {
-      case 'loginhomeserver': {
-        setMode('loginusername');
-        const homeserver = lastItem.split('\u200b')[1];
-        setCommandArgs([
-          homeserver.slice(0, 8) === 'https://' ||
-          homeserver.slice(0, 7) === 'http://'
-            ? homeserver
-            : 'https://' + homeserver
-        ]);
-        lastItem += '\nUsername: \u200b';
-        break;
-      }
-      case 'loginusername': {
+      case 'loginuserid': {
         setMode('loginpassword');
-        setCommandArgs([
-          ...commandArgs,
-          lastItem.split('\n')[2].split('\u200b')[1]
-        ]);
+        const userid = lastItem.split('\u200b')[1];
+        setCommandArgs([userid]);
         lastItem += '\nPassword: \u200b';
         break;
       }
       case 'loginpassword': {
         setMode('');
-        const username = commandArgs[1];
-        const password = lastItem.split('\n')[3].split('\u200b')[1];
+        const userid = commandArgs[0];
+        const password = lastItem.split('\n')[2].split('\u200b')[1];
         lastItem = lastItem
           .split('\n')
           .map((subline, sublineIndex) =>
@@ -93,7 +117,8 @@ export async function handleEnter(
               : subline
           )
           .join('\n');
-        const response = await matrixLogin(commandArgs[0], username, password);
+        setCursorPos(null);
+        const response = await matrixLogin(userid, password);
         if (response.success) {
           lastItem += '\nLogin succeeded';
           setDeviceId(response.deviceId);
@@ -103,7 +128,9 @@ export async function handleEnter(
           lastItem += '\nLogin failed\n' + response.error;
         }
         setCommandArgs([]);
+        setCursorPos(0);
         newCommand = true;
+        setCommandRunning(false);
         break;
       }
     }

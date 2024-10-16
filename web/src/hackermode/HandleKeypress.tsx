@@ -27,6 +27,8 @@ export async function handleKeyPress(
     newTextareaContents.push(lastItem);
     newTextareaContents.push('');
     setTextareaContents(newTextareaContents);
+    setCommandRunning(false);
+    setCursorPos(0);
   } else {
     switch (event.key) {
       case 'ArrowLeft': {
@@ -67,6 +69,7 @@ export async function handleKeyPress(
       }
       case 'Enter': {
         setCommandRunning(true);
+        setCursorPos(0);
         handleEnter(
           textareaContents,
           setTextareaContents,
@@ -82,13 +85,17 @@ export async function handleKeyPress(
           setAccessToken,
           setHackerMode,
           commandRunning,
-          setCommandRunning
+          setCommandRunning,
+          setCursorPos
         );
-        setCursorPos(0);
         break;
       }
       default: {
-        if (event.key.replace(/[\u0300-\u036f]/g, '').length === 1) {
+        if (
+          event.key.replace(/[\u0300-\u036f]/g, '').length === 1 &&
+          !event.ctrlKey &&
+          !event.metaKey
+        ) {
           if (cursorPos !== null) {
             const newTextareaContents = textareaContents;
             const lastItem = textareaContents.pop()!;
